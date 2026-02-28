@@ -309,11 +309,7 @@
 
 <!-- 状态栏 -->
 <div class="status-bar">
-    <span id="currentTime">12:34</span>
     <div style="display: flex; gap: 6px; align-items: center;">
-        <i class="fas fa-signal" style="font-size: 14px;"></i>
-        <i class="fas fa-wifi" style="font-size: 14px;"></i>
-        <i class="fas fa-battery-full" style="font-size: 18px;"></i>
     </div>
 </div>
 
@@ -410,14 +406,7 @@
 </div>
 
 <script>
-    // 更新当前时间
-    function updateTime() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
-    }
-    updateTime();
+
     setInterval(updateTime, 60000);
 
     // 从 LocalStorage 获取学生数据
