@@ -138,6 +138,48 @@
             font-weight: 400;
         }
 
+        /* 多记录展示样式 */
+        .records-list {
+            margin-top: 10px;
+        }
+
+        .record-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-info {
+            flex: 1;
+        }
+
+        .record-school {
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .record-major {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .record-badge {
+            background-color: #6BC4B8;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
         /* 职位卡片 */
         .job-card {
             background-color: #F5F5F5;
@@ -428,6 +470,19 @@
             font-weight: 400;
             transform: scale(0.95);
         }
+
+        /* 空状态提示 */
+        .empty-tip {
+            color: #999;
+            font-size: 14px;
+            padding: 10px 0;
+        }
+
+        .add-data-link {
+            color: #6BC4B8;
+            text-decoration: none;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -455,17 +510,19 @@
 <!-- 内容区 -->
 <div class="content">
 
-    <!-- 专业推荐 -->
+    <!-- 专业推荐 - 动态显示存储的学校和专业信息 -->
     <div class="recommend-card">
         <div class="recommend-header">
             <div class="recommend-left">
                 <div class="recommend-title-row">
-                    <span class="recommend-title">专业推荐</span>
-                    <span class="vote-tag">累计投票 <span class="vote-count">3964</span></span>
+                    <span class="recommend-title">我的学籍信息</span>
+                    <span class="vote-tag">共 <span class="vote-count" id="recordCount">0</span> 条记录</span>
                 </div>
-                <div class="school-name">郑州科技学院-电子科学与技术</div>
+                <div id="schoolInfoContainer">
+                    <div class="school-name">加载中...</div>
+                </div>
             </div>
-            <button class="recommend-btn">去推荐</button>
+            <button class="recommend-btn" onclick="window.location.href='xueshengxinxi.html'">去录入</button>
         </div>
     </div>
 
@@ -596,6 +653,70 @@
         <span class="nav-text">我的</span>
     </div>
 </div>
+
+<script>
+    // 页面加载时读取并显示学生信息
+    window.onload = function() {
+        loadStudentInfo();
+    };
+
+    // 从localStorage读取学生信息并显示
+    function loadStudentInfo() {
+        const STORAGE_KEY = 'studentRecords';
+        const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        const container = document.getElementById('schoolInfoContainer');
+        const countSpan = document.getElementById('recordCount');
+
+        countSpan.textContent = records.length;
+
+        if (records.length === 0) {
+            // 没有数据时显示提示
+            container.innerHTML = `
+                <div class="empty-tip">
+                    暂无学籍信息，<a href="xueshengxinxi.html" class="add-data-link">点击录入</a>
+                </div>
+            `;
+            return;
+        }
+
+        // 有数据时显示列表
+        let html = '<div class="records-list">';
+
+        // 最多显示3条记录，避免卡片过长
+        const displayRecords = records.slice(0, 3);
+
+        displayRecords.forEach((record, index) => {
+            const schoolInfo = `${record.college || '未知学院'}-${record.department || '未知院系'}`;
+            const majorInfo = `${record.major || '未知专业'}（${record.className || '未知班级'}）`;
+
+            html += `
+                <div class="record-item">
+                    <div class="record-info">
+                        <div class="record-school">
+                            ${schoolInfo}
+                            ${index === 0 ? '<span class="record-badge">最新</span>' : ''}
+                        </div>
+                        <div class="record-major">${majorInfo}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // 如果记录超过3条，显示"查看更多"
+        if (records.length > 3) {
+            html += `
+                <div class="record-item" style="justify-content: center; padding-top: 12px;">
+                    <a href="xueshengxinxi.html" style="color: #6BC4B8; font-size: 13px; text-decoration: none;">
+                        查看全部 ${records.length} 条记录 <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
+                    </a>
+                </div>
+            `;
+        }
+
+        html += '</div>';
+        container.innerHTML = html;
+    }
+</script>
 
 </body>
 </html>
