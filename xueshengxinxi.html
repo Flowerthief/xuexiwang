@@ -6,9 +6,6 @@
     <title>学生信息录入</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- 引入 Flatpickr 日期选择器 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 
@@ -102,7 +99,6 @@
         }
 
         input[type="text"],
-        input[type="date"],
         input[type="number"],
         select {
             padding: 12px 16px;
@@ -121,97 +117,115 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        /* 日期输入框包装器 */
-        .date-input-wrapper {
-            position: relative;
+        /* 数字日期输入框样式 */
+        .date-input-group {
             display: flex;
+            gap: 8px;
             align-items: center;
         }
 
-        .date-input-wrapper input {
-            padding-right: 40px;
-            cursor: pointer;
-        }
-
-        .date-icon {
-            position: absolute;
-            right: 12px;
-            color: #667eea;
-            font-size: 18px;
-            pointer-events: none;
-        }
-
-        /* 手动输入模式切换 */
-        .input-mode-toggle {
-            font-size: 12px;
-            color: #667eea;
-            cursor: pointer;
-            margin-left: auto;
-            text-decoration: underline;
-            user-select: none;
-        }
-
-        .input-mode-toggle:hover {
-            color: #764ba2;
-        }
-
-        /* Flatpickr 自定义样式 */
-        .flatpickr-calendar {
+        .date-part {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            border: 2px solid #e0e0e0;
             border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .flatpickr-day.selected {
-            background: #667eea;
-            border-color: #667eea;
-        }
-
-        .flatpickr-day.selected:hover {
-            background: #764ba2;
-            border-color: #764ba2;
-        }
-
-        .flatpickr-monthDropdown-months {
+            font-size: 16px;
             font-weight: 600;
+            transition: all 0.3s ease;
+            -moz-appearance: textfield;
         }
 
-        /* 移动端优化 */
-        @media (max-width: 768px) {
-            /* 增大触摸区域 */
-            .flatpickr-calendar {
-                width: 90vw !important;
-                max-width: 320px;
-            }
-            
-            /* 确保日期选择器在视口中央 */
-            .flatpickr-calendar.open {
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-            }
+        .date-part::-webkit-outer-spin-button,
+        .date-part::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
-        /* 备用文本输入模式 */
-        .text-date-input {
-            display: none;
+        .date-part:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: scale(1.05);
         }
 
-        .text-date-input.active {
-            display: block;
+        .date-part.valid {
+            border-color: #4caf50;
+            background-color: #e8f5e9;
         }
 
-        .native-date-input.hidden {
-            display: none;
+        .date-part.error {
+            border-color: #e74c3c;
+            background-color: #ffebee;
+        }
+
+        .date-separator {
+            font-size: 20px;
+            font-weight: 700;
+            color: #999;
+            user-select: none;
         }
 
         .date-hint {
             font-size: 12px;
             color: #999;
             margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .date-format-tip {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        /* 身份证号输入框 */
+        .idcard-input-wrapper {
+            position: relative;
+        }
+
+        .idcard-status {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
             display: none;
         }
 
-        .text-date-input.active + .date-hint {
+        .idcard-status.valid {
             display: block;
+            color: #2ecc71;
+        }
+
+        .idcard-status.invalid {
+            display: block;
+            color: #e74c3c;
+        }
+
+        /* 自动填充标记 */
+        .auto-fill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #4caf50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+
+        .edit-birthdate-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-left: 8px;
+            padding: 0;
         }
 
         .photo-upload {
@@ -442,6 +456,33 @@
             .nav-buttons {
                 flex-direction: column;
             }
+
+            .date-part {
+                padding: 14px 4px;
+                font-size: 18px;
+            }
+
+            .date-separator {
+                font-size: 16px;
+            }
+        }
+
+        /* 快速填充按钮 */
+        .quick-fill-btn {
+            background: #f0f4ff;
+            border: 1px dashed #667eea;
+            color: #667eea;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: auto;
+            transition: all 0.2s;
+        }
+
+        .quick-fill-btn:hover {
+            background: #667eea;
+            color: white;
         }
     </style>
 </head>
@@ -480,23 +521,35 @@
 
                 <div class="form-group">
                     <label class="required">身份证号</label>
-                    <input type="text" id="idCard" name="idCard" placeholder="请输入18位身份证号" maxlength="18" required>
+                    <div class="idcard-input-wrapper">
+                        <input type="text" id="idCard" name="idCard" placeholder="请输入18位身份证号" maxlength="18" required>
+                        <i class="fas fa-check-circle idcard-status valid"></i>
+                        <i class="fas fa-times-circle idcard-status invalid"></i>
+                    </div>
                 </div>
 
-                <!-- 出生日期 - 改进版本 -->
+                <!-- 出生日期 - 数字输入 -->
                 <div class="form-group">
-                    <label class="required">
-                        出生年月日
-                        <span class="input-mode-toggle" onclick="toggleDateInputMode('birthDate')">切换输入方式</span>
+                    <label>
+                        <span class="required">出生年月日</span>
+                        <span class="auto-fill-badge" id="autoFillBadge" style="display: none;">
+                            <i class="fas fa-magic"></i> 自动
+                        </span>
+                        <button type="button" class="edit-birthdate-btn" id="editBirthdateBtn" onclick="enableManualBirthdate()" style="display: none;">
+                            修改
+                        </button>
                     </label>
-                    <!-- 原生日期选择器（默认） -->
-                    <div class="date-input-wrapper native-date-input" id="birthDateNativeWrapper">
-                        <input type="date" id="birthDate" name="birthDate" required placeholder="请选择日期">
-                        <i class="fas fa-calendar-alt date-icon"></i>
+                    <div class="date-input-group" id="birthDateGroup">
+                        <input type="number" class="date-part" id="birthYear" placeholder="年" min="1900" max="2024" maxlength="4" oninput="handleDateInput(this, 'birthMonth', 4)">
+                        <span class="date-separator">-</span>
+                        <input type="number" class="date-part" id="birthMonth" placeholder="月" min="1" max="12" maxlength="2" oninput="handleDateInput(this, 'birthDay', 2)" onkeydown="handleDateBackspace(event, 'birthYear')">
+                        <span class="date-separator">-</span>
+                        <input type="number" class="date-part" id="birthDay" placeholder="日" min="1" max="31" maxlength="2" oninput="handleDateInput(this, null, 2)" onkeydown="handleDateBackspace(event, 'birthMonth')">
                     </div>
-                    <!-- 备用文本输入 -->
-                    <input type="text" id="birthDateText" class="text-date-input" placeholder="格式：2000-01-01" maxlength="10">
-                    <div class="date-hint">请输入日期，格式：2000-01-01</div>
+                    <div class="date-hint">
+                        <span>输入年份后自动跳转</span>
+                        <span class="date-format-tip">格式：2000-01-01</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -543,21 +596,35 @@
                     </select>
                 </div>
 
-                <!-- 入学日期 - 使用 Flatpickr -->
+                <!-- 入学日期 - 数字输入 -->
                 <div class="form-group">
                     <label class="required">入学日期</label>
-                    <div class="date-input-wrapper">
-                        <input type="text" id="enrollmentDate" name="enrollmentDate" class="datepicker" placeholder="请选择入学日期" required readonly>
-                        <i class="fas fa-calendar-alt date-icon"></i>
+                    <div class="date-input-group">
+                        <input type="number" class="date-part" id="enrollYear" placeholder="年" min="2000" max="2030" maxlength="4" oninput="handleDateInput(this, 'enrollMonth', 4)">
+                        <span class="date-separator">-</span>
+                        <input type="number" class="date-part" id="enrollMonth" placeholder="月" min="1" max="12" maxlength="2" oninput="handleDateInput(this, 'enrollDay', 2)" onkeydown="handleDateBackspace(event, 'enrollYear')">
+                        <span class="date-separator">-</span>
+                        <input type="number" class="date-part" id="enrollDay" placeholder="日" min="1" max="31" maxlength="2" oninput="handleDateInput(this, null, 2); calculateGraduationDate();" onkeydown="handleDateBackspace(event, 'enrollMonth')">
+                    </div>
+                    <div class="date-hint">
+                        <span>纯数字输入，自动格式化</span>
+                        <button type="button" class="quick-fill-btn" onclick="quickFillToday('enroll')">今天</button>
                     </div>
                 </div>
 
-                <!-- 预计毕业日期 - 使用 Flatpickr -->
+                <!-- 预计毕业日期 - 数字输入 -->
                 <div class="form-group">
                     <label class="required">预计毕业日期</label>
-                    <div class="date-input-wrapper">
-                        <input type="text" id="graduationDate" name="graduationDate" class="datepicker" placeholder="请选择毕业日期" required readonly>
-                        <i class="fas fa-calendar-alt date-icon"></i>
+                    <div class="date-input-group">
+                        <input type="number" class="date-part" id="gradYear" placeholder="年" min="2000" max="2035" maxlength="4" oninput="handleDateInput(this, 'gradMonth', 4)">
+                        <span class="date-separator">-</span>
+                        <input type="number" class="date-part" id="gradMonth" placeholder="月" min="1" max="12" maxlength="2" oninput="handleDateInput(this, 'gradDay', 2)" onkeydown="handleDateBackspace(event, 'gradYear')">
+                        <span class="date-separator">-</span>
+                        <input type="number" class="date-part" id="gradDay" placeholder="日" min="1" max="31" maxlength="2" oninput="handleDateInput(this, null, 2)" onkeydown="handleDateBackspace(event, 'gradMonth')">
+                    </div>
+                    <div class="date-hint">
+                        <span>根据学制自动计算</span>
+                        <span class="date-format-tip" id="gradCalcTip"></span>
                     </div>
                 </div>
             </div>
@@ -624,128 +691,299 @@
     <span>保存成功！</span>
 </div>
 
-<!-- 引入 Flatpickr -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
-
 <script>
     // 数据存储键名
     const STORAGE_KEY = 'studentRecords';
     let editingId = null;
+    let isBirthdateManualEdit = false;
 
-    // 初始化 Flatpickr 日期选择器
-    function initDatepickers() {
-        const commonConfig = {
-            locale: 'zh',
-            dateFormat: 'Y-m-d',
-            allowInput: true, // 允许手动输入
-            disableMobile: false, // 在移动端使用原生选择器（设为true则强制使用flatpickr）
-            clickOpens: true,
-            position: 'auto',
-            monthSelectorType: 'static',
-            yearSelectorType: 'static',
-            prevArrow: '<i class="fas fa-chevron-left"></i>',
-            nextArrow: '<i class="fas fa-chevron-right"></i>',
-        };
+    // 页面加载时显示已有数据
+    window.onload = function() {
+        renderDataList();
+        
+        // 绑定身份证号输入事件
+        const idCardInput = document.getElementById('idCard');
+        idCardInput.addEventListener('input', handleIdCardInput);
+        idCardInput.addEventListener('blur', validateIdCard);
+        
+        // 绑定学制变化事件
+        document.getElementById('educationSystem').addEventListener('change', calculateGraduationDate);
+    };
 
-        // 入学日期
-        flatpickr('#enrollmentDate', {
-            ...commonConfig,
-            placeholder: '请选择入学日期',
-            onChange: function(selectedDates, dateStr) {
-                // 自动计算预计毕业日期（根据学制）
-                calculateGraduationDate();
+    // 处理日期输入 - 自动跳转和限制
+    function handleDateInput(currentInput, nextInputId, maxLength) {
+        // 限制长度
+        if (currentInput.value.length > maxLength) {
+            currentInput.value = currentInput.value.slice(0, maxLength);
+        }
+        
+        // 验证范围
+        validateDatePart(currentInput);
+        
+        // 自动跳转到下一个输入框
+        if (currentInput.value.length === maxLength && nextInputId) {
+            const nextInput = document.getElementById(nextInputId);
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.select();
             }
-        });
-
-        // 毕业日期
-        flatpickr('#graduationDate', {
-            ...commonConfig,
-            placeholder: '请选择毕业日期'
-        });
-
-        // 出生日期也使用 Flatpickr（可选，如果需要统一风格）
-        // 注意：这里保留原生输入作为备选，但也可以启用flatpickr
-        /*
-        flatpickr('#birthDate', {
-            ...commonConfig,
-            placeholder: '请选择出生日期',
-            maxDate: 'today'
-        });
-        */
+        }
+        
+        // 验证完整日期
+        validateFullDate(currentInput.closest('.date-input-group'));
     }
 
-    // 切换日期输入模式
-    function toggleDateInputMode(fieldName) {
-        const nativeWrapper = document.getElementById(fieldName + 'NativeWrapper');
-        const textInput = document.getElementById(fieldName + 'Text');
-        const originalInput = document.getElementById(fieldName);
-        
-        if (textInput.classList.contains('active')) {
-            // 切换回原生模式
-            textInput.classList.remove('active');
-            nativeWrapper.classList.remove('hidden');
-            // 同步数据
-            if (textInput.value) {
-                originalInput.value = textInput.value;
+    // 处理退格键返回上一个输入框
+    function handleDateBackspace(event, prevInputId) {
+        if (event.key === 'Backspace' && event.target.value === '') {
+            const prevInput = document.getElementById(prevInputId);
+            if (prevInput) {
+                prevInput.focus();
+                // 将光标移到末尾
+                const len = prevInput.value.length;
+                prevInput.setSelectionRange(len, len);
             }
-        } else {
-            // 切换到文本模式
-            textInput.classList.add('active');
-            nativeWrapper.classList.add('hidden');
-            // 同步数据
-            if (originalInput.value) {
-                textInput.value = originalInput.value;
-            }
-            textInput.focus();
         }
     }
 
-    // 验证文本日期格式
-    function validateDateFormat(dateStr) {
-        const regex = /^\d{4}-\d{2}-\d{2}$/;
-        if (!regex.test(dateStr)) return false;
+    // 验证日期部分的有效性
+    function validateDatePart(input) {
+        const value = parseInt(input.value);
+        const min = parseInt(input.min);
+        const max = parseInt(input.max);
+        
+        if (value < min) input.value = min;
+        if (value > max) input.value = max;
+        
+        // 添加视觉反馈
+        if (input.value.length === (input.id.includes('Year') ? 4 : 2)) {
+            input.classList.add('valid');
+            input.classList.remove('error');
+        } else if (input.value.length > 0) {
+            input.classList.remove('valid');
+        }
+    }
+
+    // 验证完整日期
+    function validateFullDate(container) {
+        const inputs = container.querySelectorAll('.date-part');
+        const year = inputs[0].value;
+        const month = inputs[1].value.padStart(2, '0');
+        const day = inputs[2].value.padStart(2, '0');
+        
+        if (year.length === 4 && month.length === 2 && day.length === 2) {
+            const dateStr = `${year}-${month}-${day}`;
+            const date = new Date(dateStr);
+            const isValid = date instanceof Date && !isNaN(date) && 
+                           date.getFullYear() == year && 
+                           (date.getMonth() + 1) == parseInt(month) && 
+                           date.getDate() == parseInt(day);
+            
+            if (!isValid) {
+                inputs[2].classList.add('error');
+                inputs[2].classList.remove('valid');
+            } else {
+                inputs.forEach(input => {
+                    input.classList.add('valid');
+                    input.classList.remove('error');
+                });
+            }
+        }
+    }
+
+    // 快速填充今天
+    function quickFillToday(prefix) {
+        const today = new Date();
+        document.getElementById(prefix + 'Year').value = today.getFullYear();
+        document.getElementById(prefix + 'Month').value = String(today.getMonth() + 1).padStart(2, '0');
+        document.getElementById(prefix + 'Day').value = String(today.getDate()).padStart(2, '0');
+        
+        // 添加验证样式
+        ['Year', 'Month', 'Day'].forEach(part => {
+            const input = document.getElementById(prefix + part);
+            input.classList.add('valid');
+        });
+        
+        calculateGraduationDate();
+    }
+
+    // 处理身份证号输入
+    function handleIdCardInput(e) {
+        const idCard = e.target.value.trim();
+        
+        // 清除之前的验证状态
+        clearIdCardStatus();
+        
+        // 如果已经手动修改过出生日期，不再自动填充
+        if (isBirthdateManualEdit) return;
+        
+        // 当输入满18位时，尝试提取出生日期
+        if (idCard.length === 18) {
+            const birthDate = extractBirthDateFromIdCard(idCard);
+            if (birthDate) {
+                fillBirthDate(birthDate);
+                showIdCardStatus(true);
+            } else {
+                showIdCardStatus(false);
+            }
+        } else if (idCard.length === 15) {
+            const birthDate = extractBirthDateFromIdCard15(idCard);
+            if (birthDate) {
+                fillBirthDate(birthDate);
+                showIdCardStatus(true);
+            }
+        }
+    }
+
+    // 从18位身份证号提取出生日期
+    function extractBirthDateFromIdCard(idCard) {
+        if (!/^\d{17}[\dXx]$/.test(idCard)) return null;
+        
+        const year = idCard.substring(6, 10);
+        const month = idCard.substring(10, 12);
+        const day = idCard.substring(12, 14);
+        
+        return validateDateString(year, month, day) ? { year, month, day } : null;
+    }
+
+    // 从15位身份证号提取出生日期
+    function extractBirthDateFromIdCard15(idCard) {
+        if (!/^\d{15}$/.test(idCard)) return null;
+        
+        const year = '19' + idCard.substring(6, 8);
+        const month = idCard.substring(8, 10);
+        const day = idCard.substring(10, 12);
+        
+        return validateDateString(year, month, day) ? { year, month, day } : null;
+    }
+
+    // 验证日期字符串
+    function validateDateString(year, month, day) {
+        const dateStr = `${year}-${month}-${day}`;
         const date = new Date(dateStr);
-        return date instanceof Date && !isNaN(date);
+        
+        if (isNaN(date.getTime())) return false;
+        
+        const currentYear = new Date().getFullYear();
+        const y = parseInt(year);
+        if (y < 1900 || y > currentYear) return false;
+        
+        if (parseInt(month) < 1 || parseInt(month) > 12) return false;
+        if (parseInt(day) < 1 || parseInt(day) > 31) return false;
+        
+        return true;
+    }
+
+    // 填充出生日期
+    function fillBirthDate(dateObj) {
+        document.getElementById('birthYear').value = dateObj.year;
+        document.getElementById('birthMonth').value = dateObj.month;
+        document.getElementById('birthDay').value = dateObj.day;
+        
+        // 添加验证样式
+        ['birthYear', 'birthMonth', 'birthDay'].forEach(id => {
+            document.getElementById(id).classList.add('valid');
+        });
+        
+        // 显示自动填充标记
+        document.getElementById('autoFillBadge').style.display = 'inline-flex';
+        document.getElementById('editBirthdateBtn').style.display = 'inline';
+        
+        // 禁用输入
+        setBirthdateReadOnly(true);
+    }
+
+    // 设置出生日期只读状态
+    function setBirthdateReadOnly(readonly) {
+        ['birthYear', 'birthMonth', 'birthDay'].forEach(id => {
+            document.getElementById(id).readOnly = readonly;
+            if (readonly) {
+                document.getElementById(id).style.backgroundColor = '#e8f5e9';
+                document.getElementById(id).style.cursor = 'not-allowed';
+            } else {
+                document.getElementById(id).style.backgroundColor = '';
+                document.getElementById(id).style.cursor = '';
+            }
+        });
+    }
+
+    // 启用手动修改出生日期
+    function enableManualBirthdate() {
+        setBirthdateReadOnly(false);
+        document.getElementById('autoFillBadge').style.display = 'none';
+        document.getElementById('editBirthdateBtn').style.display = 'none';
+        isBirthdateManualEdit = true;
+        
+        document.getElementById('birthYear').focus();
+        showSuccessMessage('已解锁，现在可以手动修改');
+    }
+
+    // 清除身份证验证状态
+    function clearIdCardStatus() {
+        document.querySelector('.idcard-status.valid').style.display = 'none';
+        document.querySelector('.idcard-status.invalid').style.display = 'none';
+    }
+
+    // 显示身份证验证状态
+    function showIdCardStatus(isValid) {
+        document.querySelector('.idcard-status.valid').style.display = isValid ? 'block' : 'none';
+        document.querySelector('.idcard-status.invalid').style.display = isValid ? 'none' : 'block';
+    }
+
+    // 验证身份证号
+    function validateIdCard() {
+        const idCard = document.getElementById('idCard').value.trim();
+        if (!idCard) return;
+        
+        const isValid = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(idCard);
+        showIdCardStatus(isValid);
+    }
+
+    // 显示成功提示（临时）
+    function showSuccessMessage(msg) {
+        const msgEl = document.getElementById('successMsg');
+        const originalText = msgEl.querySelector('span').textContent;
+        msgEl.querySelector('span').textContent = msg;
+        msgEl.classList.add('show');
+        setTimeout(() => {
+            msgEl.classList.remove('show');
+            msgEl.querySelector('span').textContent = originalText;
+        }, 2000);
     }
 
     // 自动计算毕业日期
     function calculateGraduationDate() {
-        const enrollmentDate = document.getElementById('enrollmentDate').value;
+        const year = document.getElementById('enrollYear').value;
+        const month = document.getElementById('enrollMonth').value || '09';
+        const day = document.getElementById('enrollDay').value || '01';
         const educationSystem = document.getElementById('educationSystem').value;
-        const graduationInput = document.getElementById('graduationDate')._flatpickr;
-
-        if (enrollmentDate && educationSystem && graduationInput) {
-            const start = new Date(enrollmentDate);
-            const years = parseFloat(educationSystem);
-            const end = new Date(start);
-            end.setFullYear(end.getFullYear() + Math.floor(years));
-            
-            // 处理0.5年（半年）的情况
-            if (years % 1 !== 0) {
-                end.setMonth(end.getMonth() + 6);
-            }
-            
-            graduationInput.setDate(end);
-        }
-    }
-
-    // 监听学制变化
-    document.getElementById('educationSystem').addEventListener('change', calculateGraduationDate);
-
-    // 页面加载时显示已有数据
-    window.onload = function() {
-        initDatepickers();
-        renderDataList();
         
-        // 为文本日期输入添加验证
-        document.getElementById('birthDateText').addEventListener('blur', function(e) {
-            if (e.target.value && !validateDateFormat(e.target.value)) {
-                alert('日期格式不正确，请使用格式：2000-01-01');
-                e.target.value = '';
+        if (!year || !educationSystem || year.length !== 4) return;
+        
+        const years = parseFloat(educationSystem);
+        const gradYear = parseInt(year) + Math.floor(years);
+        let gradMonth = parseInt(month);
+        
+        // 处理0.5年（半年）的情况
+        if (years % 1 !== 0) {
+            gradMonth += 6;
+            if (gradMonth > 12) {
+                gradMonth -= 12;
             }
+        }
+        
+        document.getElementById('gradYear').value = gradYear;
+        document.getElementById('gradMonth').value = String(gradMonth).padStart(2, '0');
+        document.getElementById('gradDay').value = day;
+        
+        // 添加验证样式
+        ['gradYear', 'gradMonth', 'gradDay'].forEach(id => {
+            document.getElementById(id).classList.add('valid');
         });
-    };
+        
+        // 显示计算提示
+        document.getElementById('gradCalcTip').textContent = `根据${educationSystem}年学制计算`;
+    }
 
     // 图片预览
     function previewImage(input, previewId) {
@@ -754,69 +992,77 @@
 
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-
             reader.onload = function(e) {
                 preview.src = e.target.result;
                 preview.classList.add('show');
                 uploadDiv.classList.add('has-image');
             };
-
             reader.readAsDataURL(input.files[0]);
         }
     }
 
-    // 获取日期值（处理两种输入模式）
-    function getDateValue(fieldId) {
-        const nativeInput = document.getElementById(fieldId);
-        const textInput = document.getElementById(fieldId + 'Text');
+    // 获取完整日期字符串
+    function getFullDate(yearId, monthId, dayId) {
+        const year = document.getElementById(yearId).value;
+        const month = document.getElementById(monthId).value.padStart(2, '0');
+        const day = document.getElementById(dayId).value.padStart(2, '0');
         
-        if (textInput && textInput.classList.contains('active')) {
-            return textInput.value;
-        }
-        return nativeInput.value;
+        if (!year || !month || !day) return '';
+        return `${year}-${month}-${day}`;
     }
 
     // 表单提交
     document.getElementById('studentForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // 验证身份证号
+        const idCard = document.getElementById('idCard').value.trim();
+        if (!/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(idCard)) {
+            alert('请输入正确的身份证号格式');
+            document.getElementById('idCard').focus();
+            return;
+        }
+
+        // 获取日期
+        const birthDate = getFullDate('birthYear', 'birthMonth', 'birthDay');
+        const enrollmentDate = getFullDate('enrollYear', 'enrollMonth', 'enrollDay');
+        const graduationDate = getFullDate('gradYear', 'gradMonth', 'gradDay');
+
+        // 验证日期完整性
+        if (!birthDate || !enrollmentDate || !graduationDate) {
+            alert('请完整填写所有日期信息');
+            return;
+        }
+
         // 收集表单数据
         const formData = {
             id: editingId || Date.now(),
             name: document.getElementById('name').value,
-            idCard: document.getElementById('idCard').value,
-            birthDate: getDateValue('birthDate'),
+            idCard: idCard,
+            birthDate: birthDate,
             studentId: document.getElementById('studentId').value,
             college: document.getElementById('college').value,
             department: document.getElementById('department').value,
             major: document.getElementById('major').value,
             className: document.getElementById('className').value,
             educationSystem: document.getElementById('educationSystem').value,
-            enrollmentDate: document.getElementById('enrollmentDate').value,
-            graduationDate: document.getElementById('graduationDate').value,
+            enrollmentDate: enrollmentDate,
+            graduationDate: graduationDate,
             admissionPhoto: document.getElementById('admissionPreview').src,
             degreePhoto: document.getElementById('degreePreview').src,
             createTime: new Date().toLocaleString()
         };
 
-        // 验证日期
-        if (!formData.birthDate) {
-            alert('请选择或输入出生日期');
-            return;
-        }
-
         // 获取现有数据
         let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
         if (editingId) {
-            // 更新现有记录
             const index = records.findIndex(r => r.id === editingId);
             if (index !== -1) {
                 records[index] = formData;
             }
             editingId = null;
         } else {
-            // 添加新记录
             records.push(formData);
         }
 
@@ -846,25 +1092,30 @@
     function resetForm() {
         document.getElementById('studentForm').reset();
         
-        // 重置日期选择器
-        const enrollmentPicker = document.getElementById('enrollmentDate')._flatpickr;
-        const graduationPicker = document.getElementById('graduationDate')._flatpickr;
-        if (enrollmentPicker) enrollmentPicker.clear();
-        if (graduationPicker) graduationPicker.clear();
+        // 清除日期验证样式
+        document.querySelectorAll('.date-part').forEach(input => {
+            input.classList.remove('valid', 'error');
+            input.readOnly = false;
+            input.style.backgroundColor = '';
+            input.style.cursor = '';
+        });
         
-        // 重置文本日期输入
-        const birthDateText = document.getElementById('birthDateText');
-        if (birthDateText) {
-            birthDateText.value = '';
-            birthDateText.classList.remove('active');
-            document.getElementById('birthDateNativeWrapper').classList.remove('hidden');
-        }
+        // 重置出生日期状态
+        document.getElementById('autoFillBadge').style.display = 'none';
+        document.getElementById('editBirthdateBtn').style.display = 'none';
+        isBirthdateManualEdit = false;
         
+        // 清除身份证验证状态
+        clearIdCardStatus();
+        
+        // 清除图片预览
         document.getElementById('admissionPreview').classList.remove('show');
         document.getElementById('degreePreview').classList.remove('show');
         document.querySelectorAll('.photo-upload').forEach(div => {
             div.classList.remove('has-image');
         });
+        
+        document.getElementById('gradCalcTip').textContent = '';
         editingId = null;
     }
 
@@ -922,12 +1173,11 @@
     function editRecord(id) {
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         const record = records.find(r => r.id === id);
-
         if (!record) return;
 
         editingId = id;
 
-        // 填充表单
+        // 填充基本信息
         document.getElementById('name').value = record.name;
         document.getElementById('idCard').value = record.idCard;
         document.getElementById('studentId').value = record.studentId;
@@ -937,18 +1187,40 @@
         document.getElementById('className').value = record.className;
         document.getElementById('educationSystem').value = record.educationSystem;
 
-        // 填充日期
-        document.getElementById('birthDate').value = record.birthDate;
+        // 解析并填充日期
+        const birthParts = record.birthDate.split('-');
+        document.getElementById('birthYear').value = birthParts[0];
+        document.getElementById('birthMonth').value = birthParts[1];
+        document.getElementById('birthDay').value = birthParts[2];
         
-        // 使用flatpickr的setDate方法
-        const enrollmentPicker = document.getElementById('enrollmentDate')._flatpickr;
-        const graduationPicker = document.getElementById('graduationDate')._flatpickr;
+        const enrollParts = record.enrollmentDate.split('-');
+        document.getElementById('enrollYear').value = enrollParts[0];
+        document.getElementById('enrollMonth').value = enrollParts[1];
+        document.getElementById('enrollDay').value = enrollParts[2];
         
-        if (enrollmentPicker && record.enrollmentDate) {
-            enrollmentPicker.setDate(record.enrollmentDate);
-        }
-        if (graduationPicker && record.graduationDate) {
-            graduationPicker.setDate(record.graduationDate);
+        const gradParts = record.graduationDate.split('-');
+        document.getElementById('gradYear').value = gradParts[0];
+        document.getElementById('gradMonth').value = gradParts[1];
+        document.getElementById('gradDay').value = gradParts[2];
+
+        // 添加验证样式
+        document.querySelectorAll('.date-part').forEach(input => {
+            input.classList.add('valid');
+        });
+
+        // 检查出生日期是否来自身份证
+        const extractedDate = extractBirthDateFromIdCard(record.idCard) || 
+                             extractBirthDateFromIdCard15(record.idCard);
+        if (extractedDate && 
+            extractedDate.year === birthParts[0] && 
+            extractedDate.month === birthParts[1] && 
+            extractedDate.day === birthParts[2]) {
+            document.getElementById('autoFillBadge').style.display = 'inline-flex';
+            document.getElementById('editBirthdateBtn').style.display = 'inline';
+            setBirthdateReadOnly(true);
+            isBirthdateManualEdit = false;
+        } else {
+            isBirthdateManualEdit = true;
         }
 
         // 恢复图片预览
@@ -964,7 +1236,10 @@
             document.getElementById('degreePreview').parentElement.classList.add('has-image');
         }
 
-        // 滚动到顶部
+        // 显示计算提示
+        document.getElementById('gradCalcTip').textContent = `根据${record.educationSystem}年学制计算`;
+
+        validateIdCard();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
