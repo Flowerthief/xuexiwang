@@ -99,7 +99,6 @@
         }
 
         input[type="text"],
-        input[type="number"],
         select {
             padding: 12px 16px;
             border: 2px solid #e0e0e0;
@@ -117,7 +116,7 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        /* 数字日期输入框样式 */
+        /* 数字日期输入框样式 - 使用text类型但调出数字键盘 */
         .date-input-group {
             display: flex;
             gap: 8px;
@@ -133,9 +132,12 @@
             font-size: 16px;
             font-weight: 600;
             transition: all 0.3s ease;
-            -moz-appearance: textfield;
+            /* 关键：使用text类型但调出数字键盘 */
+            -webkit-appearance: none;
+            appearance: none;
         }
 
+        /* 移除number类型的箭头 */
         .date-part::-webkit-outer-spin-button,
         .date-part::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -157,6 +159,11 @@
         .date-part.error {
             border-color: #e74c3c;
             background-color: #ffebee;
+        }
+
+        /* 年份输入框稍宽 */
+        .date-part.year-part {
+            flex: 1.2;
         }
 
         .date-separator {
@@ -540,11 +547,12 @@
                         </button>
                     </label>
                     <div class="date-input-group" id="birthDateGroup">
-                        <input type="number" class="date-part" id="birthYear" placeholder="年" min="1900" max="2024" maxlength="4" oninput="handleDateInput(this, 'birthMonth', 4)">
+                        <!-- 关键修改：使用type="text" + inputmode="numeric" + pattern="[0-9]*" -->
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part year-part" id="birthYear" placeholder="年" maxlength="4" oninput="handleDateInput(this, 'birthMonth', 4)">
                         <span class="date-separator">-</span>
-                        <input type="number" class="date-part" id="birthMonth" placeholder="月" min="1" max="12" maxlength="2" oninput="handleDateInput(this, 'birthDay', 2)" onkeydown="handleDateBackspace(event, 'birthYear')">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part" id="birthMonth" placeholder="月" maxlength="2" oninput="handleDateInput(this, 'birthDay', 2)" onkeydown="handleDateBackspace(event, 'birthYear')">
                         <span class="date-separator">-</span>
-                        <input type="number" class="date-part" id="birthDay" placeholder="日" min="1" max="31" maxlength="2" oninput="handleDateInput(this, null, 2)" onkeydown="handleDateBackspace(event, 'birthMonth')">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part" id="birthDay" placeholder="日" maxlength="2" oninput="handleDateInput(this, null, 2)" onkeydown="handleDateBackspace(event, 'birthMonth')">
                     </div>
                     <div class="date-hint">
                         <span>输入年份后自动跳转</span>
@@ -600,11 +608,11 @@
                 <div class="form-group">
                     <label class="required">入学日期</label>
                     <div class="date-input-group">
-                        <input type="number" class="date-part" id="enrollYear" placeholder="年" min="2000" max="2030" maxlength="4" oninput="handleDateInput(this, 'enrollMonth', 4)">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part year-part" id="enrollYear" placeholder="年" maxlength="4" oninput="handleDateInput(this, 'enrollMonth', 4)">
                         <span class="date-separator">-</span>
-                        <input type="number" class="date-part" id="enrollMonth" placeholder="月" min="1" max="12" maxlength="2" oninput="handleDateInput(this, 'enrollDay', 2)" onkeydown="handleDateBackspace(event, 'enrollYear')">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part" id="enrollMonth" placeholder="月" maxlength="2" oninput="handleDateInput(this, 'enrollDay', 2)" onkeydown="handleDateBackspace(event, 'enrollYear')">
                         <span class="date-separator">-</span>
-                        <input type="number" class="date-part" id="enrollDay" placeholder="日" min="1" max="31" maxlength="2" oninput="handleDateInput(this, null, 2); calculateGraduationDate();" onkeydown="handleDateBackspace(event, 'enrollMonth')">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part" id="enrollDay" placeholder="日" maxlength="2" oninput="handleDateInput(this, null, 2); calculateGraduationDate();" onkeydown="handleDateBackspace(event, 'enrollMonth')">
                     </div>
                     <div class="date-hint">
                         <span>纯数字输入，自动格式化</span>
@@ -616,11 +624,11 @@
                 <div class="form-group">
                     <label class="required">预计毕业日期</label>
                     <div class="date-input-group">
-                        <input type="number" class="date-part" id="gradYear" placeholder="年" min="2000" max="2035" maxlength="4" oninput="handleDateInput(this, 'gradMonth', 4)">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part year-part" id="gradYear" placeholder="年" maxlength="4" oninput="handleDateInput(this, 'gradMonth', 4)">
                         <span class="date-separator">-</span>
-                        <input type="number" class="date-part" id="gradMonth" placeholder="月" min="1" max="12" maxlength="2" oninput="handleDateInput(this, 'gradDay', 2)" onkeydown="handleDateBackspace(event, 'gradYear')">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part" id="gradMonth" placeholder="月" maxlength="2" oninput="handleDateInput(this, 'gradDay', 2)" onkeydown="handleDateBackspace(event, 'gradYear')">
                         <span class="date-separator">-</span>
-                        <input type="number" class="date-part" id="gradDay" placeholder="日" min="1" max="31" maxlength="2" oninput="handleDateInput(this, null, 2)" onkeydown="handleDateBackspace(event, 'gradMonth')">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part" id="gradDay" placeholder="日" maxlength="2" oninput="handleDateInput(this, null, 2)" onkeydown="handleDateBackspace(event, 'gradMonth')">
                     </div>
                     <div class="date-hint">
                         <span>根据学制自动计算</span>
@@ -700,26 +708,29 @@
     // 页面加载时显示已有数据
     window.onload = function() {
         renderDataList();
-        
+
         // 绑定身份证号输入事件
         const idCardInput = document.getElementById('idCard');
         idCardInput.addEventListener('input', handleIdCardInput);
         idCardInput.addEventListener('blur', validateIdCard);
-        
+
         // 绑定学制变化事件
         document.getElementById('educationSystem').addEventListener('change', calculateGraduationDate);
     };
 
     // 处理日期输入 - 自动跳转和限制
     function handleDateInput(currentInput, nextInputId, maxLength) {
+        // 过滤非数字字符
+        currentInput.value = currentInput.value.replace(/[^0-9]/g, '');
+        
         // 限制长度
         if (currentInput.value.length > maxLength) {
             currentInput.value = currentInput.value.slice(0, maxLength);
         }
-        
+
         // 验证范围
         validateDatePart(currentInput);
-        
+
         // 自动跳转到下一个输入框
         if (currentInput.value.length === maxLength && nextInputId) {
             const nextInput = document.getElementById(nextInputId);
@@ -728,7 +739,7 @@
                 nextInput.select();
             }
         }
-        
+
         // 验证完整日期
         validateFullDate(currentInput.closest('.date-input-group'));
     }
@@ -749,14 +760,31 @@
     // 验证日期部分的有效性
     function validateDatePart(input) {
         const value = parseInt(input.value);
-        const min = parseInt(input.min);
-        const max = parseInt(input.max);
+        const id = input.id;
         
+        // 根据输入框类型设置范围
+        let min = 1, max = 99;
+        if (id.includes('Year')) {
+            min = 1900;
+            max = 2100;
+        } else if (id.includes('Month')) {
+            min = 1;
+            max = 12;
+        } else if (id.includes('Day')) {
+            min = 1;
+            max = 31;
+        }
+
         if (value < min) input.value = min;
         if (value > max) input.value = max;
         
+        // 补零显示（可选）
+        if (input.value.length === 1 && value > 0 && !id.includes('Year')) {
+            // 月份和日期自动补零，但只在失去焦点时
+        }
+
         // 添加视觉反馈
-        if (input.value.length === (input.id.includes('Year') ? 4 : 2)) {
+        if (input.value.length === (id.includes('Year') ? 4 : 2)) {
             input.classList.add('valid');
             input.classList.remove('error');
         } else if (input.value.length > 0) {
@@ -770,15 +798,15 @@
         const year = inputs[0].value;
         const month = inputs[1].value.padStart(2, '0');
         const day = inputs[2].value.padStart(2, '0');
-        
+
         if (year.length === 4 && month.length === 2 && day.length === 2) {
             const dateStr = `${year}-${month}-${day}`;
             const date = new Date(dateStr);
-            const isValid = date instanceof Date && !isNaN(date) && 
-                           date.getFullYear() == year && 
-                           (date.getMonth() + 1) == parseInt(month) && 
-                           date.getDate() == parseInt(day);
-            
+            const isValid = date instanceof Date && !isNaN(date) &&
+                date.getFullYear() == year &&
+                (date.getMonth() + 1) == parseInt(month) &&
+                date.getDate() == parseInt(day);
+
             if (!isValid) {
                 inputs[2].classList.add('error');
                 inputs[2].classList.remove('valid');
@@ -797,26 +825,26 @@
         document.getElementById(prefix + 'Year').value = today.getFullYear();
         document.getElementById(prefix + 'Month').value = String(today.getMonth() + 1).padStart(2, '0');
         document.getElementById(prefix + 'Day').value = String(today.getDate()).padStart(2, '0');
-        
+
         // 添加验证样式
         ['Year', 'Month', 'Day'].forEach(part => {
             const input = document.getElementById(prefix + part);
             input.classList.add('valid');
         });
-        
+
         calculateGraduationDate();
     }
 
     // 处理身份证号输入
     function handleIdCardInput(e) {
         const idCard = e.target.value.trim();
-        
+
         // 清除之前的验证状态
         clearIdCardStatus();
-        
+
         // 如果已经手动修改过出生日期，不再自动填充
         if (isBirthdateManualEdit) return;
-        
+
         // 当输入满18位时，尝试提取出生日期
         if (idCard.length === 18) {
             const birthDate = extractBirthDateFromIdCard(idCard);
@@ -838,22 +866,22 @@
     // 从18位身份证号提取出生日期
     function extractBirthDateFromIdCard(idCard) {
         if (!/^\d{17}[\dXx]$/.test(idCard)) return null;
-        
+
         const year = idCard.substring(6, 10);
         const month = idCard.substring(10, 12);
         const day = idCard.substring(12, 14);
-        
+
         return validateDateString(year, month, day) ? { year, month, day } : null;
     }
 
     // 从15位身份证号提取出生日期
     function extractBirthDateFromIdCard15(idCard) {
         if (!/^\d{15}$/.test(idCard)) return null;
-        
+
         const year = '19' + idCard.substring(6, 8);
         const month = idCard.substring(8, 10);
         const day = idCard.substring(10, 12);
-        
+
         return validateDateString(year, month, day) ? { year, month, day } : null;
     }
 
@@ -861,16 +889,16 @@
     function validateDateString(year, month, day) {
         const dateStr = `${year}-${month}-${day}`;
         const date = new Date(dateStr);
-        
+
         if (isNaN(date.getTime())) return false;
-        
+
         const currentYear = new Date().getFullYear();
         const y = parseInt(year);
         if (y < 1900 || y > currentYear) return false;
-        
+
         if (parseInt(month) < 1 || parseInt(month) > 12) return false;
         if (parseInt(day) < 1 || parseInt(day) > 31) return false;
-        
+
         return true;
     }
 
@@ -879,16 +907,16 @@
         document.getElementById('birthYear').value = dateObj.year;
         document.getElementById('birthMonth').value = dateObj.month;
         document.getElementById('birthDay').value = dateObj.day;
-        
+
         // 添加验证样式
         ['birthYear', 'birthMonth', 'birthDay'].forEach(id => {
             document.getElementById(id).classList.add('valid');
         });
-        
+
         // 显示自动填充标记
         document.getElementById('autoFillBadge').style.display = 'inline-flex';
         document.getElementById('editBirthdateBtn').style.display = 'inline';
-        
+
         // 禁用输入
         setBirthdateReadOnly(true);
     }
@@ -913,7 +941,7 @@
         document.getElementById('autoFillBadge').style.display = 'none';
         document.getElementById('editBirthdateBtn').style.display = 'none';
         isBirthdateManualEdit = true;
-        
+
         document.getElementById('birthYear').focus();
         showSuccessMessage('已解锁，现在可以手动修改');
     }
@@ -934,7 +962,7 @@
     function validateIdCard() {
         const idCard = document.getElementById('idCard').value.trim();
         if (!idCard) return;
-        
+
         const isValid = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(idCard);
         showIdCardStatus(isValid);
     }
@@ -957,13 +985,13 @@
         const month = document.getElementById('enrollMonth').value || '09';
         const day = document.getElementById('enrollDay').value || '01';
         const educationSystem = document.getElementById('educationSystem').value;
-        
+
         if (!year || !educationSystem || year.length !== 4) return;
-        
+
         const years = parseFloat(educationSystem);
         const gradYear = parseInt(year) + Math.floor(years);
         let gradMonth = parseInt(month);
-        
+
         // 处理0.5年（半年）的情况
         if (years % 1 !== 0) {
             gradMonth += 6;
@@ -971,16 +999,16 @@
                 gradMonth -= 12;
             }
         }
-        
+
         document.getElementById('gradYear').value = gradYear;
         document.getElementById('gradMonth').value = String(gradMonth).padStart(2, '0');
         document.getElementById('gradDay').value = day;
-        
+
         // 添加验证样式
         ['gradYear', 'gradMonth', 'gradDay'].forEach(id => {
             document.getElementById(id).classList.add('valid');
         });
-        
+
         // 显示计算提示
         document.getElementById('gradCalcTip').textContent = `根据${educationSystem}年学制计算`;
     }
@@ -1006,7 +1034,7 @@
         const year = document.getElementById(yearId).value;
         const month = document.getElementById(monthId).value.padStart(2, '0');
         const day = document.getElementById(dayId).value.padStart(2, '0');
-        
+
         if (!year || !month || !day) return '';
         return `${year}-${month}-${day}`;
     }
@@ -1091,7 +1119,7 @@
     // 重置表单
     function resetForm() {
         document.getElementById('studentForm').reset();
-        
+
         // 清除日期验证样式
         document.querySelectorAll('.date-part').forEach(input => {
             input.classList.remove('valid', 'error');
@@ -1099,22 +1127,22 @@
             input.style.backgroundColor = '';
             input.style.cursor = '';
         });
-        
+
         // 重置出生日期状态
         document.getElementById('autoFillBadge').style.display = 'none';
         document.getElementById('editBirthdateBtn').style.display = 'none';
         isBirthdateManualEdit = false;
-        
+
         // 清除身份证验证状态
         clearIdCardStatus();
-        
+
         // 清除图片预览
         document.getElementById('admissionPreview').classList.remove('show');
         document.getElementById('degreePreview').classList.remove('show');
         document.querySelectorAll('.photo-upload').forEach(div => {
             div.classList.remove('has-image');
         });
-        
+
         document.getElementById('gradCalcTip').textContent = '';
         editingId = null;
     }
@@ -1192,12 +1220,12 @@
         document.getElementById('birthYear').value = birthParts[0];
         document.getElementById('birthMonth').value = birthParts[1];
         document.getElementById('birthDay').value = birthParts[2];
-        
+
         const enrollParts = record.enrollmentDate.split('-');
         document.getElementById('enrollYear').value = enrollParts[0];
         document.getElementById('enrollMonth').value = enrollParts[1];
         document.getElementById('enrollDay').value = enrollParts[2];
-        
+
         const gradParts = record.graduationDate.split('-');
         document.getElementById('gradYear').value = gradParts[0];
         document.getElementById('gradMonth').value = gradParts[1];
@@ -1209,11 +1237,11 @@
         });
 
         // 检查出生日期是否来自身份证
-        const extractedDate = extractBirthDateFromIdCard(record.idCard) || 
-                             extractBirthDateFromIdCard15(record.idCard);
-        if (extractedDate && 
-            extractedDate.year === birthParts[0] && 
-            extractedDate.month === birthParts[1] && 
+        const extractedDate = extractBirthDateFromIdCard(record.idCard) ||
+            extractBirthDateFromIdCard15(record.idCard);
+        if (extractedDate &&
+            extractedDate.year === birthParts[0] &&
+            extractedDate.month === birthParts[1] &&
             extractedDate.day === birthParts[2]) {
             document.getElementById('autoFillBadge').style.display = 'inline-flex';
             document.getElementById('editBirthdateBtn').style.display = 'inline';
