@@ -76,6 +76,7 @@
         .form-group {
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .form-group.full-width {
@@ -116,11 +117,12 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        /* 数字日期输入框样式 - 使用text类型但调出数字键盘 */
+        /* 数字日期输入框样式 */
         .date-input-group {
             display: flex;
             gap: 8px;
             align-items: center;
+            position: relative;
         }
 
         .date-part {
@@ -132,7 +134,6 @@
             font-size: 16px;
             font-weight: 600;
             transition: all 0.3s ease;
-            /* 关键：使用text类型但调出数字键盘 */
             -webkit-appearance: none;
             appearance: none;
         }
@@ -157,8 +158,8 @@
         }
 
         .date-part.error {
-            border-color: #e74c3c;
-            background-color: #ffebee;
+            border-color: #e74c3c !important;
+            background-color: #ffebee !important;
         }
 
         /* 年份输入框稍宽 */
@@ -184,6 +185,33 @@
         .date-format-tip {
             color: #667eea;
             font-weight: 500;
+        }
+
+        /* 验证提示 */
+        .validation-tip {
+            position: absolute;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            bottom: 100%;
+            left: 0;
+            margin-bottom: 4px;
+            z-index: 10;
+            white-space: nowrap;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* 身份证号输入框 */
@@ -547,7 +575,6 @@
                         </button>
                     </label>
                     <div class="date-input-group" id="birthDateGroup">
-                        <!-- 关键修改：使用type="text" + inputmode="numeric" + pattern="[0-9]*" -->
                         <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part year-part" id="birthYear" placeholder="年" maxlength="4" oninput="handleDateInput(this, 'birthMonth', 4)">
                         <span class="date-separator">-</span>
                         <input type="text" inputmode="numeric" pattern="[0-9]*" class="date-part" id="birthMonth" placeholder="月" maxlength="2" oninput="handleDateInput(this, 'birthDay', 2)" onkeydown="handleDateBackspace(event, 'birthYear')">
@@ -720,15 +747,18 @@
 
     // 处理日期输入 - 自动跳转和限制
     function handleDateInput(currentInput, nextInputId, maxLength) {
+        // 保存原始值用于比较
+        const originalValue = currentInput.value;
+
         // 过滤非数字字符
         currentInput.value = currentInput.value.replace(/[^0-9]/g, '');
-        
+
         // 限制长度
         if (currentInput.value.length > maxLength) {
             currentInput.value = currentInput.value.slice(0, maxLength);
         }
 
-        // 验证范围
+        // 验证范围（只反馈不修改）
         validateDatePart(currentInput);
 
         // 自动跳转到下一个输入框
@@ -741,7 +771,10 @@
         }
 
         // 验证完整日期
-        validateFullDate(currentInput.closest('.date-input-group'));
+        const container = currentInput.closest('.date-input-group');
+        if (container) {
+            validateFullDate(container);
+        }
     }
 
     // 处理退格键返回上一个输入框
@@ -757,16 +790,29 @@
         }
     }
 
-    // 验证日期部分的有效性
+    // 验证日期部分的有效性 - ✅ 修复版：只反馈不修改
     function validateDatePart(input) {
+        // 允许空值
+        if (input.value === '') {
+            input.classList.remove('valid', 'error');
+            return;
+        }
+
         const value = parseInt(input.value);
         const id = input.id;
-        
+
+        // 检查是否为有效数字
+        if (isNaN(value)) {
+            input.classList.add('error');
+            input.classList.remove('valid');
+            return;
+        }
+
         // 根据输入框类型设置范围
         let min = 1, max = 99;
         if (id.includes('Year')) {
-            min = 1900;
-            max = 2100;
+            min = 1;      // ✅ 允许任何年份
+            max = 9999;    // ✅ 扩大到9999
         } else if (id.includes('Month')) {
             min = 1;
             max = 12;
@@ -775,26 +821,54 @@
             max = 31;
         }
 
-        if (value < min) input.value = min;
-        if (value > max) input.value = max;
-        
-        // 补零显示（可选）
-        if (input.value.length === 1 && value > 0 && !id.includes('Year')) {
-            // 月份和日期自动补零，但只在失去焦点时
-        }
+        // ✅ 移除强制修改，只添加视觉反馈
+        if (value < min || value > max) {
+            // 超出范围时添加错误样式，但不修改值
+            input.classList.add('error');
+            input.classList.remove('valid');
 
-        // 添加视觉反馈
-        if (input.value.length === (id.includes('Year') ? 4 : 2)) {
+            // 显示验证提示
+            showValidationTip(input, `请输入${min}-${max}之间的数字`);
+        } else {
+            // 有效时添加成功样式
             input.classList.add('valid');
             input.classList.remove('error');
-        } else if (input.value.length > 0) {
-            input.classList.remove('valid');
         }
+    }
+
+    // 显示验证提示
+    function showValidationTip(input, message) {
+        // 移除已有的提示
+        const existingTip = input.parentElement.querySelector('.validation-tip');
+        if (existingTip) {
+            existingTip.remove();
+        }
+
+        // 创建新提示
+        const tip = document.createElement('div');
+        tip.className = 'validation-tip';
+        tip.textContent = message;
+
+        // 确保父元素有相对定位
+        if (window.getComputedStyle(input.parentElement).position === 'static') {
+            input.parentElement.style.position = 'relative';
+        }
+
+        input.parentElement.appendChild(tip);
+
+        // 2秒后自动移除
+        setTimeout(() => {
+            if (tip.parentElement) {
+                tip.remove();
+            }
+        }, 2000);
     }
 
     // 验证完整日期
     function validateFullDate(container) {
         const inputs = container.querySelectorAll('.date-part');
+        if (inputs.length < 3) return;
+
         const year = inputs[0].value;
         const month = inputs[1].value.padStart(2, '0');
         const day = inputs[2].value.padStart(2, '0');
@@ -894,7 +968,7 @@
 
         const currentYear = new Date().getFullYear();
         const y = parseInt(year);
-        if (y < 1900 || y > currentYear) return false;
+        if (y < 1900 || y > currentYear + 100) return false;
 
         if (parseInt(month) < 1 || parseInt(month) > 12) return false;
         if (parseInt(day) < 1 || parseInt(day) > 31) return false;
