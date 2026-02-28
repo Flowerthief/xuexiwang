@@ -1,0 +1,200 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* 字体设置：先尝试微软雅黑，然后是Segoe UI，最后是通用无衬线字体 */
+    font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    background-color: #ffffff; /* 修正了 fffff 为 ffffff */
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh; /* 确保页面至少和视口一样高 */
+    display: flex;
+    flex-direction: column; /* 子元素垂直排列 */
+    align-items: center; /* 水平居中 */
+    padding: 20px;
+}
+
+.header {
+    /* width: none%; <-- 已移除，此处宽度将由内容或父元素决定，或根据max-width限制 */
+    /* max-width: 500px; <-- 注释掉了，如果需要限制宽度，可以取消这个注释 */
+    text-align: center;
+    padding: 30px 0 0px; /* 这里的 0px 可以简写为 0 */
+}
+
+.title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1a3a6c;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #666;
+}
+
+.container {
+    border-radius: 8px;
+    width: 100%;
+    max-width: 420px; /* 限制容器的最大宽度 */
+    padding: 0px; /* 这里的 0px 可以简写为 0 */
+    margin: 10px 0 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: #555;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+    outline: none; /* 移除了选中时的轮廓，可能需要考虑可访问性 */
+}
+
+.form-control:focus {
+    border-color: #24B886;
+    /* box-shadow: 0 0 0 2px rgba(26, 86, 219, 0.1); <-- 注释掉了 */
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: #24B886;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+}
+
+.form-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 22px;
+    font-size: 14px;
+}
+
+.form-links a {
+    color: #666;
+    text-decoration: none;
+}
+
+.form-links a:hover {
+    text-decoration: underline;
+}
+
+.footer-nav {
+    width: 100%;
+    max-width: 500px; /* 限制 footer-nav 的最大宽度 */
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 20px 0;
+    flex-wrap: wrap; /* 允许换行 */
+    border-top: 1px solid #eee;
+    margin-top: auto; /* 将 footer-nav 推到页面底部 */
+}
+
+.footer-nav a {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap; /* 防止链接文字换行 */
+}
+
+.footer-nav a:hover {
+    color: #1a56db;
+}
+
+/* 响应式设计：调整媒体查询的断点和语法 */
+
+/* 尝试使用更常见的响应式断点 */
+/* 例如：当屏幕小于 768px 时 */
+@media (max-width: 768px) {
+    .header {
+        padding: 25px 0 0px;
+    }
+
+    .title {
+        font-size: 24px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .container {
+        padding: 0 20px; /* 在小屏幕上稍微增加左右内边距 */
+    }
+
+    .form-control {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    .btn-login {
+        padding: 13px;
+        font-size: 15px;
+    }
+
+    .form-links {
+        flex-direction: column; /* 垂直堆叠链接 */
+        gap: 12px;
+        align-items: center;
+    }
+
+    .footer-nav {
+        gap: 20px;
+        padding: 15px 0;
+    }
+    /* .xy{ <-- 注释掉且已修正，如果需要，请重新定义 */
+    /* display: flex; */
+    /* justify-content: center; */
+    /* } */
+}
+
+/* 假设另一个更小的断点 */
+@media (max-width: 400px) { /* 调整了断点，使其更合理 */
+    .footer-nav {
+        gap: 15px;
+    }
+
+    .footer-nav a {
+        font-size: 13px;
+    }
+    /* .xy{ <-- 注释掉且已修正 */
+    /* height: 300px; */
+    /* width: ; <-- 这里的 width 也是无效的，如果需要设置，请明确 */
+    /* } */
+}
+
+/* 移除了 .tt 元素，因为它可能是无效的或者需要更清楚的定义 */
+/* .tt { */
+/*     width: 100%; */
+/*     height: 100%; */
+/* } */
+
+/* 移除了 .xy 元素，因为它可能是无效的或者需要更清楚的定义 */
+/* .xy { */
+/*     display: flex; */
+/*     justify-content: center; */
+/* } */

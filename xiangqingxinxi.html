@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>高等学籍</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 100px;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            background-color: #5CB8B2;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        /* 搜索栏 */
+        .search-bar {
+            background-color: #5CB8B2;
+            padding: 0 16px 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* 主导航栏 */
+        .main-nav {
+            background-color: #5CB8B2;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            position: relative;
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .nav-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* 次级导航栏 */
+        .sub-nav {
+            background-color: white;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .sub-nav-back {
+            color: #333;
+            font-size: 18px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .sub-nav-title {
+            color: #333;
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* 内容区 */
+        .content {
+            padding: 16px;
+        }
+
+        /* 考证现状横幅 */
+        .exam-banner {
+            background: linear-gradient(135deg, #6B9BD8 0%, #5B8BC8 100%);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+        }
+
+        .exam-title {
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .exam-desc {
+            color: rgba(255,255,255,0.95);
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 70%;
+            font-weight: 400;
+        }
+
+        .exam-illustration {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 120px;
+            height: 90px;
+        }
+
+        /* 功能入口列表 */
+        .function-list {
+            margin-bottom: 16px;
+        }
+
+        .function-item {
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .function-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .function-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .icon-image {
+            color: #5B9BD8;
+            font-size: 28px;
+        }
+
+        .icon-user {
+            color: #5B9BD8;
+            font-size: 28px;
+        }
+
+        .function-text {
+            font-size: 16px;
+            color: #333;
+            font-weight: 400;
+        }
+
+        .function-arrow {
+            color: #ccc;
+            font-size: 18px;
+        }
+
+        /* 个人信息卡片 - 绿色渐变 */
+        .info-card {
+            background: linear-gradient(135deg, #7BC8A0 0%, #6BB88F 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(123, 200, 160, 0.3);
+        }
+
+        /* 照片区域 */
+        .photo-section {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .photo-item {
+            text-align: center;
+        }
+
+        .photo-frame {
+            width: 80px;
+            height: 100px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 8px;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+        }
+
+        .photo-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            font-weight: 400;
+        }
+
+        /* 基本信息 */
+        .basic-info {
+            margin-bottom: 20px;
+        }
+
+        .name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .meta-info {
+            font-size: 15px;
+            color: rgba(255,255,255,0.95);
+            font-weight: 400;
+        }
+
+        .meta-divider {
+            margin: 0 8px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* 学校信息 */
+        .school-info {
+            margin-bottom: 8px;
+        }
+
+        .school-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .school-detail {
+            font-size: 15px;
+            color: rgba(255,255,255,0.95);
+            font-weight: 400;
+        }
+
+        .detail-divider {
+            margin: 0 8px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* 本科标签 */
+        .level-tag {
+            display: inline-block;
+            background-color: rgba(255,255,255,0.25);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.3);
+            margin-top: 12px;
+        }
+
+        /* 详细信息列表 */
+        .detail-list {
+            background-color: white;
+            border-radius: 12px;
+            padding: 8px 0;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .detail-item {
+            display: flex;
+            padding: 14px 20px;
+            align-items: center;
+        }
+
+        .detail-label {
+            width: 100px;
+            font-size: 15px;
+            color: #999;
+            font-weight: 400;
+        }
+
+        .detail-value {
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* 底部按钮 */
+        .bottom-btn {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 12px 16px 24px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .verify-btn {
+            width: 100%;
+            background-color: #6BC4B8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            color: #999;
+            margin-bottom: 16px;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            color: #ccc;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 10px 24px;
+            background-color: #5CB8B2;
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 状态栏 -->
+<div class="status-bar">
+    <span id="currentTime">01:37</span>
+    <div style="display: flex; gap: 5px; align-items: center;">
+        <i class="fas fa-signal" style="font-size: 14px;"></i>
+        <i class="fas fa-wifi" style="font-size: 14px;"></i>
+        <i class="fas fa-battery-three-quarters" style="font-size: 16px; color: #ff6b6b;"></i>
+    </div>
+</div>
+
+<!-- 搜索栏 -->
+<div class="search-bar">
+    <i class="fas fa-chevron-left" style="font-size: 12px;"></i>
+</div>
+
+<!-- 主导航栏 -->
+<div class="main-nav">
+    <div class="nav-btn" onclick="history.back()">
+        <i class="fas fa-chevron-left"></i>
+    </div>
+    <div class="nav-title">高等学籍</div>
+    <div class="nav-btn" onclick="window.location.href='xuexinwangshouye.html'">
+        <i class="fas fa-times"></i>
+    </div>
+</div>
+
+<!-- 次级导航栏 -->
+<div class="sub-nav">
+    <i class="fas fa-chevron-left sub-nav-back" onclick="history.back()"></i>
+    <span class="sub-nav-title">高等学籍</span>
+</div>
+
+<!-- 内容区 -->
+<div class="content" id="contentArea">
+
+    <!-- 考证现状横幅 -->
+    <div class="exam-banner">
+        <div class="exam-title">考证现状</div>
+        <div class="exam-desc">
+            参与考证需求调研，分享备考经验，共筑<br>
+            高效考证指南
+        </div>
+        <div class="exam-illustration">
+            <div style="position: absolute; right: 10px; bottom: 10px; width: 80px; height: 60px; background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%); border-radius: 50% 50% 0 0; transform: rotate(-15deg);"></div>
+        </div>
+    </div>
+
+    <!-- 功能入口 -->
+    <div class="function-list">
+        <div class="function-item">
+            <div class="function-left">
+                <div class="function-icon">
+                    <i class="far fa-image icon-image"></i>
+                </div>
+                <span class="function-text">查看图像采集码</span>
+            </div>
+            <i class="fas fa-chevron-right function-arrow"></i>
+        </div>
+
+        <div class="function-item">
+            <div class="function-left">
+                <div class="function-icon">
+                    <i class="fas fa-user icon-user"></i>
+                </div>
+                <span class="function-text">学历照片还未校对</span>
+            </div>
+            <i class="fas fa-chevron-right function-arrow"></i>
+        </div>
+    </div>
+
+    <!-- 动态加载区域 -->
+    <div id="studentDetail"></div>
+
+</div>
+
+<!-- 底部按钮 -->
+<div class="bottom-btn">
+    <button class="verify-btn">查看验证报告</button>
+</div>
+
+<script>
+    // 更新当前时间
+    function updateTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+    }
+    updateTime();
+    setInterval(updateTime, 60000);
+
+    // 从LocalStorage获取学生数据
+    function loadStudentDetail() {
+        const STORAGE_KEY = 'studentRecords';
+        const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+        // 获取当前查看的学生ID（从sessionStorage或URL参数）
+        let currentId = sessionStorage.getItem('currentStudentId');
+
+        // 如果没有ID，默认显示第一条
+        if (!currentId && records.length > 0) {
+            currentId = records[0].id;
+        }
+
+        const student = records.find(r => r.id == currentId);
+        const container = document.getElementById('studentDetail');
+
+        if (!student) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>未找到学生信息</p>
+                    <a href="学生信息录入.html" class="back-btn">去录入信息</a>
+                </div>
+            `;
+            return;
+        }
+
+        // 判断学历层次
+        const educationLevel = student.educationSystem === '4' ? '本科' : '专科';
+
+        // 格式化日期显示
+        const birthDate = student.birthDate ? student.birthDate.replace(/-/g, '年').replace(/年(\d{2})$/, '年$1日') : '';
+        const enrollmentDate = student.enrollmentDate ? student.enrollmentDate.replace(/-/g, '年').replace(/年(\d{2})$/, '年$1日') : '';
+        const graduationDate = student.graduationDate ? student.graduationDate.replace(/-/g, '年').replace(/年(\d{2})$/, '年$1日') : '';
+
+        // 判断性别（根据身份证号）
+        let gender = '男';
+        if (student.idCard && student.idCard.length === 18) {
+            gender = parseInt(student.idCard.charAt(16)) % 2 === 0 ? '女' : '男';
+        }
+
+        // 判断民族（默认汉族，可扩展）
+        const ethnicity = '汉族';
+
+        // 判断学籍状态
+        const now = new Date();
+        const gradDate = new Date(student.graduationDate);
+        const status = gradDate < now ? '已毕业' : '在籍（注册学籍）';
+
+        // 处理照片显示
+        const admissionPhotoHtml = student.admissionPhoto && !student.admissionPhoto.includes(window.location.href)
+            ? `<img src="${student.admissionPhoto}" alt="录取照片">`
+            : `<div class="photo-placeholder">暂无照片</div>`;
+
+        const degreePhotoHtml = student.degreePhoto && !student.degreePhoto.includes(window.location.href)
+            ? `<img src="${student.degreePhoto}" alt="学历照片">`
+            : `<div class="photo-placeholder">暂无照片</div>`;
+
+        container.innerHTML = `
+            <!-- 个人信息卡片 -->
+            <div class="info-card">
+                <!-- 照片区域 -->
+                <div class="photo-section">
+                    <div class="photo-item">
+                        <div class="photo-frame">
+                            ${admissionPhotoHtml}
+                        </div>
+                        <div class="photo-label">录取照片</div>
+                    </div>
+                    <div class="photo-item">
+                        <div class="photo-frame">
+                            ${degreePhotoHtml}
+                        </div>
+                        <div class="photo-label">学历照片</div>
+                    </div>
+
+                    <!-- 基本信息 -->
+                    <div style="flex: 1; padding-left: 8px;">
+                        <div class="name">${student.name}</div>
+                        <div class="meta-info">
+                            ${gender} <span class="meta-divider">|</span> ${birthDate}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 学校信息 -->
+                <div class="school-info">
+                    <div class="school-name">${student.college}</div>
+                    <div class="school-detail">
+                        ${student.major} <span class="detail-divider">|</span> 普通全日制
+                    </div>
+                    <div class="level-tag">${educationLevel}</div>
+                </div>
+            </div>
+
+            <!-- 详细信息列表 -->
+            <div class="detail-list">
+                <div class="detail-item">
+                    <div class="detail-label">民族</div>
+                    <div class="detail-value">${ethnicity}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">证件号码</div>
+                    <div class="detail-value">${student.idCard}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">学制</div>
+                    <div class="detail-value">${student.educationSystem} 年</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">学历类别</div>
+                    <div class="detail-value">普通高等教育</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">分院</div>
+                    <div class="detail-value">${student.department}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">系所</div>
+                    <div class="detail-value">${student.department}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">班级</div>
+                    <div class="detail-value">${student.className}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">学号</div>
+                    <div class="detail-value">${student.studentId}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">入学日期</div>
+                    <div class="detail-value">${enrollmentDate}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">学籍状态</div>
+                    <div class="detail-value">${status}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">预计毕业日期</div>
+                    <div class="detail-value">${graduationDate}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 页面加载时执行
+    window.onload = function() {
+        loadStudentDetail();
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>高等教育信息</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            -webkit-font-smoothing: antialiased;
+            color: #333;
+        }
+
+        /* 顶部状态栏 - 深青色 */
+        .status-bar {
+            background-color: #5CB8B2;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        /* 主导航栏 - 深青色 */
+        .main-nav {
+            background-color: #5CB8B2;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+        }
+
+        /* 次导航栏 - 浅绿色 */
+        .sub-nav {
+            background-color: #6BC4B8;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 16px;
+            position: relative;
+        }
+
+        /* 返回按钮绝对定位 */
+        .sub-nav-back {
+            position: absolute;
+            left: 16px;
+            color: white;
+            font-size: 18px;
+        }
+
+        /* 次级导航标题居中 */
+        .sub-nav-title {
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* 导航按钮 */
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        /* 职场实习横幅 - 淡紫色 */
+        .internship-banner {
+            background: linear-gradient(135deg, #E8E4F0 0%, #DDD8E8 100%);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .internship-title {
+            color: #5A4A8A;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .internship-desc {
+            color: #6B5B9B;
+            font-size: 13px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            padding: 0 16px;
+            margin-bottom: 24px;
+        }
+
+        /* 区域标题 */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            letter-spacing: 0.5px;
+        }
+
+        .section-hint {
+            font-size: 13px;
+            color: #999;
+            font-weight: 400;
+        }
+
+        .section-hint a {
+            color: #5CB8B2;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+        /* 卡片样式 - 绿色 */
+        .card-green {
+            background: linear-gradient(135deg, #7BC8A0 0%, #6BB88F 100%);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(123, 200, 160, 0.3);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-green:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(123, 200, 160, 0.2);
+        }
+
+        /* 卡片样式 - 蓝色 */
+        .card-blue {
+            background: linear-gradient(135deg, #6B9BD8 0%, #5B8BC8 100%);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(107, 155, 216, 0.3);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-blue:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(107, 155, 216, 0.2);
+        }
+
+        /* 卡片头部 */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .school-name {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+        }
+
+        /* 标签 */
+        .level-tag {
+            background-color: rgba(255,255,255,0.25);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* 卡片信息 */
+        .card-info {
+            font-size: 15px;
+            color: rgba(255,255,255,0.95);
+            margin-top: 8px;
+            font-weight: 400;
+        }
+
+        .divider {
+            margin: 0 8px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* 学位信息区域 */
+        .degree-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 24px 20px;
+            margin: 0 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            text-align: center;
+        }
+
+        .degree-hint {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .hint-icon {
+            color: #ccc;
+            font-size: 18px;
+            margin-left: 4px;
+        }
+
+        .hint-toggle {
+            color: #5CB8B2;
+            font-size: 15px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* 考研信息 */
+        .exam-section {
+            padding: 0 16px;
+        }
+
+        .exam-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .exam-placeholder {
+            background-color: white;
+            border-radius: 12px;
+            height: 60px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        .add-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 20px;
+            background-color: #5CB8B2;
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 状态栏 -->
+<div class="status-bar">
+    <span id="currentTime">12:34</span>
+    <div style="display: flex; gap: 6px; align-items: center;">
+        <i class="fas fa-signal" style="font-size: 14px;"></i>
+        <i class="fas fa-wifi" style="font-size: 14px;"></i>
+        <i class="fas fa-battery-full" style="font-size: 18px;"></i>
+    </div>
+</div>
+
+<!-- 主导航栏 -->
+<div class="main-nav">
+    <div class="nav-btn" onclick="history.back()">
+        <i class="fas fa-chevron-left"></i>
+    </div>
+    <div class="nav-btn">
+        <i class="fas fa-times"></i>
+    </div>
+</div>
+
+<!-- 次级导航栏 - 标题居中 -->
+<div class="sub-nav">
+    <div class="sub-nav-back" onclick="history.back()">
+        <i class="fas fa-chevron-left"></i>
+    </div>
+    <div class="sub-nav-title">高等教育信息</div>
+</div>
+
+<!-- 职场实习横幅 -->
+<div class="internship-banner">
+    <div>
+        <div class="internship-title">职场实习</div>
+        <div class="internship-desc">
+            反馈实习困惑、实战心得与建议，帮大家<br>
+            实习少走弯路
+        </div>
+    </div>
+    <div style="width: 100px; height: 80px; position: relative;">
+        <div style="position: absolute; right: 0; bottom: 0; display: flex; align-items: flex-end;">
+            <div style="background: linear-gradient(135deg, #9B8EC7 0%, #7A6DB5 100%); width: 40px; height: 60px; border-radius: 8px 8px 0 0; margin-right: 4px; opacity: 0.8;"></div>
+            <div style="background: linear-gradient(135deg, #B8A8D8 0%, #9B8EC7 100%); width: 35px; height: 50px; border-radius: 8px 8px 0 0; margin-right: 4px; opacity: 0.9;"></div>
+            <div style="background: linear-gradient(135deg, #D4C8E8 0%, #B8A8D8 100%); width: 30px; height: 40px; border-radius: 8px 8px 0 0;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 学籍信息 -->
+<div class="content-section">
+    <div class="section-header">
+        <div class="section-title">学籍信息 (<span id="studentCount">0</span>)</div>
+        <div class="section-hint">
+            还有学籍没有显示出来？<a href="#">尝试绑定</a>
+        </div>
+    </div>
+
+    <div id="studentInfoContainer">
+        <!-- 动态生成的学籍卡片将在这里显示 -->
+    </div>
+</div>
+
+<!-- 学历信息 -->
+<div class="content-section">
+    <div class="section-header">
+        <div class="section-title">学历信息 (<span id="degreeCount">0</span>)</div>
+        <div class="section-hint">
+            还有学历没有显示出来？<a href="#">尝试绑定</a>
+        </div>
+    </div>
+
+    <div id="degreeInfoContainer">
+        <!-- 动态生成的学历卡片将在这里显示 -->
+    </div>
+</div>
+
+<!-- 学位信息 -->
+<div style="margin-bottom: 24px;">
+    <div class="content-section" style="margin-bottom: 12px;">
+        <div class="section-header">
+            <div class="section-title">学位信息</div>
+            <div class="section-hint">
+                还有学位没有显示出来？<a href="#">尝试绑定</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="degree-section">
+        <div class="degree-hint">
+            您还未绑定学位信息，可以使用"尝试<br>
+            绑定学位"功能绑定您的学位 <i class="far fa-question-circle hint-icon"></i>
+        </div>
+        <div class="hint-toggle">
+            提示信息 <i class="fas fa-chevron-down" style="margin-left: 4px; font-size: 12px;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- 考研信息 -->
+<div class="exam-section">
+    <div class="exam-title">考研信息</div>
+    <div class="exam-placeholder"></div>
+</div>
+
+<script>
+    // 更新当前时间
+    function updateTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+    }
+    updateTime();
+    setInterval(updateTime, 60000);
+
+    // 从 LocalStorage 获取学生数据
+    function loadStudentData() {
+        const STORAGE_KEY = 'studentRecords';
+        const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+        const studentContainer = document.getElementById('studentInfoContainer');
+        const degreeContainer = document.getElementById('degreeInfoContainer');
+        const studentCount = document.getElementById('studentCount');
+        const degreeCount = document.getElementById('degreeCount');
+
+        const now = new Date();
+        const students = [];
+        const degrees = [];
+
+        records.forEach(record => {
+            const graduationDate = new Date(record.graduationDate);
+            const isGraduated = graduationDate < now;
+
+            // 判断学历层次：4年制为本科，其他为专科
+            const educationLevel = record.educationSystem === '4' ? '本科' : '专科';
+
+            const cardData = {
+                id: record.id,
+                school: record.college,
+                major: record.major,
+                level: educationLevel
+            };
+
+            if (isGraduated) {
+                degrees.push(cardData);
+            } else {
+                students.push(cardData);
+            }
+        });
+
+        // 更新计数
+        studentCount.textContent = students.length;
+        degreeCount.textContent = degrees.length;
+
+        // 渲染学籍信息
+        if (students.length === 0) {
+            studentContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-user-graduate"></i>
+                    <p>暂无在读学籍信息</p>
+                    <button class="add-btn" onclick="window.location.href='xueshengxinxi.html'">
+                        <i class="fas fa-plus"></i> 添加学籍信息
+                    </button>
+                </div>
+            `;
+        } else {
+            studentContainer.innerHTML = students.map(student => `
+                <div class="card-green" onclick="viewDetail(${student.id})">
+                    <div class="card-header">
+                        <div class="school-name">${student.school}</div>
+                        <div class="level-tag">${student.level}</div>
+                    </div>
+                    <div class="card-info">
+                        ${student.major} <span class="divider">|</span> 普通全日制
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 渲染学历信息
+        if (degrees.length === 0) {
+            degreeContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-certificate"></i>
+                    <p>暂无已毕业学历信息</p>
+                </div>
+            `;
+        } else {
+            degreeContainer.innerHTML = degrees.map(degree => `
+                <div class="card-blue" onclick="viewDetail(${degree.id})">
+                    <div class="card-header">
+                        <div class="school-name">${degree.school}</div>
+                        <div class="level-tag">${degree.level}</div>
+                    </div>
+                    <div class="card-info">
+                        ${degree.major} <span class="divider">|</span> 普通全日制
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // 查看详情
+    function viewDetail(id) {
+        // 将当前查看的ID存入sessionStorage，详情页可以读取
+        sessionStorage.setItem('currentStudentId', id);
+        window.location.href = 'xiangqingxinxi.html';
+    }
+
+    // 页面加载时执行
+    window.onload = function() {
+        loadStudentData();
+    };
+
+    // 监听storage变化（当其他页面修改数据时刷新）
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'studentRecords') {
+            loadStudentData();
+        }
+    });
+</script>
+
+</body>
+</html>
