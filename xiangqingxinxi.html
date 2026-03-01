@@ -387,6 +387,22 @@
             text-decoration: none;
             font-size: 14px;
         }
+
+        /* 调试面板 */
+        .debug-panel {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 16px;
+            font-size: 12px;
+            color: #856404;
+            display: none;
+        }
+
+        .debug-panel.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -394,13 +410,11 @@
 <!-- 状态栏 -->
 <div class="status-bar">
     <div style="display: flex; gap: 5px; align-items: center;">
-
     </div>
 </div>
 
 <!-- 搜索栏 -->
 <div class="search-bar">
-
 </div>
 
 <!-- 主导航栏 -->
@@ -418,6 +432,12 @@
 <div class="sub-nav">
     <i class="fas fa-chevron-left sub-nav-back" onclick="history.back()"></i>
     <span class="sub-nav-title">高等学籍</span>
+</div>
+
+<!-- 调试面板（默认隐藏，有错误时显示） -->
+<div id="debugPanel" class="debug-panel" style="display: none">
+    <strong>调试信息：</strong>
+    <div id="debugContent"></div>
 </div>
 
 <!-- 内容区 -->
@@ -469,149 +489,166 @@
 </div>
 
 <script>
-    setInterval(updateTime, 60000);
+    // 数据存储键名 - 必须与录入页一致
+    const STORAGE_KEY = 'studentRecords';
 
-    // 从LocalStorage获取学生数据
+    // 调试日志
+    function debugLog(message) {
+        console.log('[高等学籍]', message);
+        const debugPanel = document.getElementById('debugPanel');
+        const debugContent = document.getElementById('debugContent');
+        debugPanel.classList.add('show');
+        debugContent.innerHTML += message + '<br>';
+    }
+
+    // 从LocalStorage获取学生数据 - 修复版
     function loadStudentDetail() {
-        const STORAGE_KEY = 'studentRecords';
-        const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        // 1. 尝试从 URL 参数获取 ID（优先）
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentId = urlParams.get('id');
 
-        // 获取当前查看的学生ID（从sessionStorage或URL参数）
-        let currentId = sessionStorage.getItem('currentStudentId');
-
-        // 如果没有ID，默认显示第一条
-        if (!currentId && records.length > 0) {
-            currentId = records[0].id;
+        // 2. 如果没有 URL 参数，再从 sessionStorage 获取
+        if (!currentId) {
+            currentId = sessionStorage.getItem('currentStudentId');
         }
 
-        const student = records.find(r => r.id == currentId);
+        debugLog('当前学生ID: ' + (currentId || '无'));
+
+        // 3. 读取 localStorage 数据
+        let records = [];
+        try {
+            const rawData = localStorage.getItem(STORAGE_KEY);
+            debugLog('原始数据: ' + (rawData ? rawData.substring(0, 100) + '...' : 'null'));
+
+            if (rawData) {
+                records = JSON.parse(rawData);
+            }
+        } catch (e) {
+            debugLog('读取数据失败: ' + e.message);
+        }
+
+        debugLog('记录数: ' + records.length);
+
         const container = document.getElementById('studentDetail');
+
+        // 4. 如果没有 ID 但有记录，默认显示第一条
+        if (!currentId && records.length > 0) {
+            currentId = records[0].id;
+            debugLog('默认显示第一条，ID: ' + currentId);
+        }
+
+        // 5. 查找学生 - 使用宽松匹配（==）
+        const student = records.find(r => r.id == currentId);
+
+        debugLog('找到学生: ' + (student ? student.name : '否'));
 
         if (!student) {
             container.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-user-slash"></i>
                     <p>未找到学生信息</p>
+                    <p style="font-size: 12px; color: #999; margin-top: 8px;">
+                        ID: ${currentId || '无'} | 记录数: ${records.length}
+                    </p>
                     <a href="学生信息录入.html" class="back-btn">去录入信息</a>
                 </div>
             `;
             return;
         }
 
+        // 6. 渲染学生信息
+        renderStudentInfo(student);
+    }
+
+    // 渲染学生信息
+    function renderStudentInfo(student) {
         // 判断学历层次
         const educationLevel = student.educationSystem === '4' ? '本科' : '专科';
 
-        // 格式化日期显示
-        const birthDate = student.birthDate ? student.birthDate.replace(/-/g, '年').replace(/年(\d{2})$/, '年$1日') : '';
-        const enrollmentDate = student.enrollmentDate ? student.enrollmentDate.replace(/-/g, '年').replace(/年(\d{2})$/, '年$1日') : '';
-        const graduationDate = student.graduationDate ? student.graduationDate.replace(/-/g, '年').replace(/年(\d{2})$/, '年$1日') : '';
+        // 格式化日期
+        const formatDate = (dateStr) => {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[0]}年${parts[1]}月${parts[2]}日`;
+            }
+            return dateStr;
+        };
 
-        // 判断性别（根据身份证号）
+        const birthDate = formatDate(student.birthDate);
+        const enrollmentDate = formatDate(student.enrollmentDate);
+        const graduationDate = formatDate(student.graduationDate);
+
+        // 判断性别
         let gender = '男';
         if (student.idCard && student.idCard.length === 18) {
             gender = parseInt(student.idCard.charAt(16)) % 2 === 0 ? '女' : '男';
         }
 
-        // 判断民族（默认汉族，可扩展）
-        const ethnicity = '汉族';
-
         // 判断学籍状态
         const now = new Date();
-        const gradDate = new Date(student.graduationDate);
-        const status = gradDate < now ? '已毕业' : '在籍（注册学籍）';
+        const gradDate = student.graduationDate ? new Date(student.graduationDate) : null;
+        const status = (gradDate && gradDate < now) ? '已毕业' : '在籍（注册学籍）';
 
-        // 处理照片显示
-        const admissionPhotoHtml = student.admissionPhoto && !student.admissionPhoto.includes(window.location.href)
-            ? `<img src="${student.admissionPhoto}" alt="录取照片">`
+        // 处理照片 - 安全判断
+        const hasPhoto = (photo) => photo && photo.startsWith('data:image');
+
+        const admissionPhotoHtml = hasPhoto(student.admissionPhoto)
+            ? `<img src="${student.admissionPhoto}" alt="录取照片" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+               <div class="photo-placeholder" style="display:none">暂无照片</div>`
             : `<div class="photo-placeholder">暂无照片</div>`;
 
-        const degreePhotoHtml = student.degreePhoto && !student.degreePhoto.includes(window.location.href)
-            ? `<img src="${student.degreePhoto}" alt="学历照片">`
+        const degreePhotoHtml = hasPhoto(student.degreePhoto)
+            ? `<img src="${student.degreePhoto}" alt="学历照片" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+               <div class="photo-placeholder" style="display:none">暂无照片</div>`
             : `<div class="photo-placeholder">暂无照片</div>`;
 
+        // 安全转义
+        const escape = (text) => {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+
+        const container = document.getElementById('studentDetail');
         container.innerHTML = `
             <!-- 个人信息卡片 -->
             <div class="info-card">
-                <!-- 照片区域 -->
                 <div class="photo-section">
                     <div class="photo-item">
-                        <div class="photo-frame">
-                            ${admissionPhotoHtml}
-                        </div>
+                        <div class="photo-frame">${admissionPhotoHtml}</div>
                         <div class="photo-label">录取照片</div>
                     </div>
                     <div class="photo-item">
-                        <div class="photo-frame">
-                            ${degreePhotoHtml}
-                        </div>
+                        <div class="photo-frame">${degreePhotoHtml}</div>
                         <div class="photo-label">学历照片</div>
                     </div>
-
-                    <!-- 基本信息 -->
                     <div style="flex: 1; padding-left: 8px;">
-                        <div class="name">${student.name}</div>
-                        <div class="meta-info">
-                            ${gender} <span class="meta-divider">|</span> ${birthDate}
-                        </div>
+                        <div class="name">${escape(student.name)}</div>
+                        <div class="meta-info">${gender} <span class="meta-divider">|</span> ${birthDate}</div>
                     </div>
                 </div>
-
-                <!-- 学校信息 -->
                 <div class="school-info">
-                    <div class="school-name">${student.college}</div>
-                    <div class="school-detail">
-                        ${student.major} <span class="detail-divider">|</span> 普通全日制
-                    </div>
+                    <div class="school-name">${escape(student.college)}</div>
+                    <div class="school-detail">${escape(student.major)} <span class="detail-divider">|</span> 普通全日制</div>
                     <div class="level-tag">${educationLevel}</div>
                 </div>
             </div>
 
             <!-- 详细信息列表 -->
             <div class="detail-list">
-                <div class="detail-item">
-                    <div class="detail-label">民族</div>
-                    <div class="detail-value">${ethnicity}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">证件号码</div>
-                    <div class="detail-value">${student.idCard}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">学制</div>
-                    <div class="detail-value">${student.educationSystem} 年</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">学历类别</div>
-                    <div class="detail-value">普通高等教育</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">分院</div>
-                    <div class="detail-value">${student.department}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">系所</div>
-                    <div class="detail-value">${student.department}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">班级</div>
-                    <div class="detail-value">${student.className}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">学号</div>
-                    <div class="detail-value">${student.studentId}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">入学日期</div>
-                    <div class="detail-value">${enrollmentDate}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">学籍状态</div>
-                    <div class="detail-value">${status}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">预计毕业日期</div>
-                    <div class="detail-value">${graduationDate}</div>
-                </div>
+                <div class="detail-item"><div class="detail-label">民族</div><div class="detail-value">汉族</div></div>
+                <div class="detail-item"><div class="detail-label">证件号码</div><div class="detail-value">${escape(student.idCard)}</div></div>
+                <div class="detail-item"><div class="detail-label">学制</div><div class="detail-value">${escape(student.educationSystem)} 年</div></div>
+                <div class="detail-item"><div class="detail-label">学历类别</div><div class="detail-value">普通高等教育</div></div>
+                <div class="detail-item"><div class="detail-label">分院</div><div class="detail-value">${escape(student.department)}</div></div>
+                <div class="detail-item"><div class="detail-label">系所</div><div class="detail-value">${escape(student.department)}</div></div>
+                <div class="detail-item"><div class="detail-label">班级</div><div class="detail-value">${escape(student.className)}</div></div>
+                <div class="detail-item"><div class="detail-label">学号</div><div class="detail-value">${escape(student.studentId)}</div></div>
+                <div class="detail-item"><div class="detail-label">入学日期</div><div class="detail-value">${enrollmentDate}</div></div>
+                <div class="detail-item"><div class="detail-label">学籍状态</div><div class="detail-value">${status}</div></div>
+                <div class="detail-item"><div class="detail-label">预计毕业日期</div><div class="detail-value">${graduationDate}</div></div>
             </div>
         `;
     }
